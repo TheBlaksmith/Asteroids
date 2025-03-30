@@ -9,8 +9,6 @@ from shot import Shot
 def main():
     pygame.init()
     print("Starting Asteroids!")
-    print(f"Screen width: {SCREEN_WIDTH}")
-    print(f"Screen height: {SCREEN_HEIGHT}")
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
    
@@ -26,7 +24,7 @@ def main():
     asteroid_field = AsteroidField()
 
     Player.containers = (updatable, drawable)
-
+    hit_count = 0
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     dt = 0
 
@@ -38,12 +36,16 @@ def main():
 
         for asteroid in asteroids:
             if asteroid.collides_with(player):
+                print(f"Your score: {hit_count}")
+                print(f"High Score to beat: 5,000")
                 print("Game over!")
                 sys.exit()
             for shot in shots:
                 if asteroid.collides_with(shot):
+                    hit_count += 1
                     shot.kill()
                     asteroid.split()
+    
         screen.fill("black")
         for obj in drawable:
             obj.draw(screen)
