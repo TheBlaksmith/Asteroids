@@ -6,26 +6,29 @@ from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
 
+# Function to load the high score from a file
+def load_high_score():
+    try:
+        with open("high_score.txt", "r") as file:
+            return int(file.read().strip())
+    except FileNotFoundError:
+        return 0  # Return 0 if the file does not exist
+
+# Function to save the high score to a file
+def save_high_score(high_score):
+    with open("high_score.txt", "w") as file:
+        file.write(str(high_score))
+
 def main():
     pygame.init()
     print("Starting Asteroids!")
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
-    
-   
+
+    # Load the high score at the start of the game
+    high_score = load_high_score()
+
     text_font = pygame.font.SysFont("Arial", 25)
-
-    def game_over(time):
-        player.kill()
-        print(f"Your score: {hit_count}")
-        print(f"High Score to beat: 5,000")
-        print("GAME OVER!")
-        screen.fill("white")
-        for i in range(1, time):
-            draw_text("GAME OVER",text_font, "black", SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
-            if i == time:
-                sys.exit()
-
 
     def draw_text(text, font, text_col, x, y):
         img = font.render(text, True, text_col)
@@ -46,24 +49,37 @@ def main():
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     dt = 0
 
+    game_over = False
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
-        updatable.update(dt)
-        pygame.display.set_caption("Asteroids")
-        screen.fill("black")
-        for asteroid in asteroids:
-            if asteroid.collides_with(player):
-                asteroid.kill()
-                game_over(5)
-            for shot in shots:
-                if asteroid.collides_with(shot):
-                    hit_count += 1
-                    shot.kill()
-                    asteroid.split()
-    
-        
+        if not game_over:
+            updatable.update(dt)
+            pygame.display.set_caption("Asteroids")
+            screen.fill("black")
+            for asteroid in asteroids:
+                if asteroid.collides_with(player):
+                    game_over = True
+                    break
+                for shot in shots:
+                    if asteroid.collides_with(shot):
+                        hit_count += 1
+                        shot.kill()
+                        asteroid.split()
+        else:
+            # Update the high score if needed
+            if hit_count > high_score:
+                high_score = hit_count
+                save_high_score(high_score)  # Save the new high score to the file
+
+            screen.fill("red")
+            draw_text("GAME OVER", text_font, "black", SCREEN_WIDTH / 2 - 70, SCREEN_HEIGHT / 2 - 50)
+            draw_text(f"High Score: {high_score}", text_font, "black", SCREEN_WIDTH / 2 - 80, SCREEN_HEIGHT / 2 + 30)
+
+            # Add restart and quit logic here if needed
+
         draw_text(f"Score: {hit_count}", text_font, "white", 10, 20)
         for obj in drawable:
             obj.draw(screen)
