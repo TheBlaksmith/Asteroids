@@ -11,7 +11,25 @@ def main():
     print("Starting Asteroids!")
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     clock = pygame.time.Clock()
+    
    
+    text_font = pygame.font.SysFont("Arial", 25)
+
+    def game_over(time):
+        player.kill()
+        print(f"Your score: {hit_count}")
+        print(f"High Score to beat: 5,000")
+        print("GAME OVER!")
+        screen.fill("black")
+        for i in range(1, time):
+            draw_text("GAME OVER",text_font, "white", SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+            if i == time:
+                sys.exit()
+
+
+    def draw_text(text, font, text_col, x, y):
+        img = font.render(text, True, text_col)
+        screen.blit(img, (x, y))
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
@@ -33,20 +51,20 @@ def main():
             if event.type == pygame.QUIT:
                 return
         updatable.update(dt)
-
+        pygame.display.set_caption("Asteroids")
+        screen.fill("black")
         for asteroid in asteroids:
             if asteroid.collides_with(player):
-                print(f"Your score: {hit_count}")
-                print(f"High Score to beat: 5,000")
-                print("Game over!")
-                sys.exit()
+                asteroid.kill()
+                game_over(10)
             for shot in shots:
                 if asteroid.collides_with(shot):
                     hit_count += 1
                     shot.kill()
                     asteroid.split()
     
-        screen.fill("black")
+        
+        draw_text(f"Score: {hit_count}", text_font, "white", 10, 20)
         for obj in drawable:
             obj.draw(screen)
         pygame.display.flip()
