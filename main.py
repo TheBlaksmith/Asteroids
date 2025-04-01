@@ -20,9 +20,9 @@ def main():
         print(f"Your score: {hit_count}")
         print(f"High Score to beat: 5,000")
         print("GAME OVER!")
-        screen.fill("black")
+        screen.fill("white")
         for i in range(1, time):
-            draw_text("GAME OVER",text_font, "white", SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
+            draw_text("GAME OVER",text_font, "black", SCREEN_WIDTH/2, SCREEN_HEIGHT/2)
             if i == time:
                 sys.exit()
 
@@ -56,7 +56,7 @@ def main():
         for asteroid in asteroids:
             if asteroid.collides_with(player):
                 asteroid.kill()
-                game_over(10)
+                game_over(5)
             for shot in shots:
                 if asteroid.collides_with(shot):
                     hit_count += 1
